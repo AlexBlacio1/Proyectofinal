@@ -1,26 +1,30 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image, Alert, TextInput } from 'react-native';
+import { styles } from '../theme/appTheme';
 
 interface Product {
     id: string;
     name: string;
     price: number;
     image: any;
+    quantity?: number;
 }
 
 const products: Product[] = [
-    { id: '1', name: 'Computadora', price: 1000 , image: require('../../assets/images/computer.png') },
-    { id: '2', name: 'Celular', price: 500, image: require('../../assets/images/phone.png') },
-    { id: '3', name: 'Laptop', price: 1200, image: require('../../assets/images/laptop.png') },
-    { id: '4', name: 'Impresora', price: 200, image: require('../../assets/images/printer.png') },
+    { id: '1', name: 'Computadoras', price: 1000, image: require('../../assets/images/computer.png') },
+    { id: '2', name: 'Celulares', price: 500, image: require('../../assets/images/phone.png') },
+    { id: '3', name: 'Laptops', price: 1200, image: require('../../assets/images/laptop.png') },
+    { id: '4', name: 'Impresoras', price: 200, image: require('../../assets/images/printer.png') },
     { id: '5', name: 'Accesorios', price: 50, image: require('../../assets/images/accessory.png') },
 ];
 
 export const CartScreen = () => {
     const [cart, setCart] = useState<Product[]>([]);
+    const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
 
     const addToCart = (product: Product) => {
-        setCart([...cart, product]);
+        setCart([...cart, { ...product, quantity: quantities[product.id] || 1 }]);
+        setQuantities({ ...quantities, [product.id]: 1 });
     };
 
     const removeFromCart = (id: string) => {
@@ -28,7 +32,7 @@ export const CartScreen = () => {
     };
 
     const calculateTotal = () => {
-        return cart.reduce((total, product) => total + product.price, 0);
+        return cart.reduce((total, product) => total + (product.price * (product.quantity || 1)), 0);
     };
 
     const handlePurchase = () => {
@@ -39,14 +43,28 @@ export const CartScreen = () => {
 
         Alert.alert(
             'Compra Realizada',
-            `Gracias por su compra. Total: $${calculateTotal()}`,
-            [{ text: 'Aceptar', onPress: () => setCart([]) }] 
+            `Gracias por su compra. Total: $${calculateTotal().toFixed(2)}`,
+            [{ text: 'Aceptar', onPress: () => setCart([]) }]
         );
+    };
+
+    const increaseQuantity = (id: string) => {
+        setQuantities(prevQuantities => ({
+            ...prevQuantities,
+            [id]: (prevQuantities[id] || 1) + 1
+        }));
+    };
+
+    const decreaseQuantity = (id: string) => {
+        setQuantities(prevQuantities => ({
+            ...prevQuantities,
+            [id]: Math.max((prevQuantities[id] || 1) - 1, 1)
+        }));
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Carrito de Compras</Text>
+            <Text style={styles.title}>Productos</Text>
             <FlatList
                 data={products}
                 keyExtractor={(item) => item.id}
@@ -54,9 +72,23 @@ export const CartScreen = () => {
                     <View style={styles.productContainer}>
                         <Image source={item.image} style={styles.productImage} />
                         <Text style={styles.productName}>{item.name}</Text>
-                        <Text style={styles.productPrice}>${item.price}</Text>
+                        <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
+                        <View style={styles.quantityContainer}>
+                            <TouchableOpacity style={styles.quantityButton} onPress={() => decreaseQuantity(item.id)}>
+                                <Text style={styles.quantityButtonText}>-</Text>
+                            </TouchableOpacity>
+                            <TextInput
+                                style={styles.quantityInput}
+                                value={(quantities[item.id] || 1).toString()}
+                                keyboardType="numeric"
+                                editable={false}
+                            />
+                            <TouchableOpacity style={styles.quantityButton} onPress={() => increaseQuantity(item.id)}>
+                                <Text style={styles.quantityButtonText}>+</Text>
+                            </TouchableOpacity>
+                        </View>
                         <TouchableOpacity style={styles.button} onPress={() => addToCart(item)}>
-                            <Text style={styles.buttonText}>Agregar al Carrito</Text>
+                            <Text style={styles.buttonText}>Agregar al carrito</Text>
                         </TouchableOpacity>
                     </View>
                 )}
@@ -66,18 +98,20 @@ export const CartScreen = () => {
                 <FlatList
                     data={cart}
                     keyExtractor={(item) => item.id}
+                    horizontal={true}
                     renderItem={({ item }) => (
                         <View style={styles.cartItemContainer}>
                             <Image source={item.image} style={styles.cartItemImage} />
                             <Text style={styles.cartItemName}>{item.name}</Text>
-                            <Text style={styles.cartItemPrice}>${item.price}</Text>
+                            <Text style={styles.cartItemPrice}>${item.price.toFixed(2)}</Text>
+                            <Text style={styles.cartItemQuantity}>Cantidad: {item.quantity}</Text>
                             <TouchableOpacity style={styles.removeButton} onPress={() => removeFromCart(item.id)}>
                                 <Text style={styles.removeButtonText}>Eliminar</Text>
                             </TouchableOpacity>
                         </View>
                     )}
                 />
-                <Text style={styles.totalText}>Total: ${calculateTotal()}</Text>
+                <Text style={styles.totalText}>Total: ${calculateTotal().toFixed(2)}</Text>
                 <TouchableOpacity style={styles.purchaseButton} onPress={handlePurchase}>
                     <Text style={styles.purchaseButtonText}>Realizar Compra</Text>
                 </TouchableOpacity>
@@ -85,116 +119,5 @@ export const CartScreen = () => {
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 20,
-        backgroundColor: '#f8f8f8',
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 20,
-    },
-    productContainer: {
-        backgroundColor: '#fff',
-        padding: 15,
-        marginVertical: 8,
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    productImage: {
-        width: 50,
-        height: 50,
-        marginRight: 10,
-    },
-    productName: {
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    productPrice: {
-        fontSize: 16,
-        color: '#888',
-    },
-    button: {
-        marginTop: 10,
-        padding: 10,
-        backgroundColor: '#007bff',
-        borderRadius: 5,
-    },
-    buttonText: {
-        color: '#fff',
-        textAlign: 'center',
-        fontWeight: 'bold',
-    },
-    cartContainer: {
-        marginTop: 30,
-    },
-    cartTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        marginBottom: 10,
-    },
-    cartItemContainer: {
-        backgroundColor: '#fff',
-        padding: 15,
-        marginVertical: 8,
-        borderRadius: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    cartItemImage: {
-        width: 50,
-        height: 50,
-        marginRight: 10,
-    },
-    cartItemName: {
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    cartItemPrice: {
-        fontSize: 16,
-        color: '#888',
-    },
-    removeButton: {
-        marginTop: 10,
-        padding: 10,
-        backgroundColor: '#dc3545',
-        borderRadius: 5,
-    },
-    removeButtonText: {
-        color: '#fff',
-        textAlign: 'center',
-        fontWeight: 'bold',
-    },
-    totalText: {
-        marginTop: 15,
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    purchaseButton: {
-        marginTop: 20,
-        padding: 15,
-        backgroundColor: '#28a745',
-        borderRadius: 5,
-    },
-    purchaseButtonText: {
-        color: '#fff',
-        textAlign: 'center',
-        fontWeight: 'bold',
-    },
-});
 
 export default CartScreen;

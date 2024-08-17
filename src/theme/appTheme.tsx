@@ -1,4 +1,3 @@
-// src/theme/appTheme.ts
 import { StyleSheet } from 'react-native';
 import { PRIMARY_COLOR, SECUNDARY_COLOR } from '../commons/constants';
 
@@ -39,7 +38,7 @@ export const styles = StyleSheet.create({
         marginTop: 30,
         backgroundColor: PRIMARY_COLOR,
         paddingVertical: 15,
-        borderRadius: 10
+        borderRadius: 10,
     },
     buttonText: {
         color: SECUNDARY_COLOR,
@@ -64,16 +63,44 @@ export const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 4,
         elevation: 2,
+        alignItems: 'center',
     },
     productName: {
         fontSize: 18,
         fontWeight: 'bold',
+        textAlign: 'center',
     },
     productPrice: {
         fontSize: 16,
         color: '#888',
+        textAlign: 'center',
     },
-    
+    quantityContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 10,
+        justifyContent: 'center',
+    },
+    quantityButton: {
+        backgroundColor: PRIMARY_COLOR,
+        padding: 10,
+        borderRadius: 5,
+        marginHorizontal: 5,
+    },
+    quantityButtonText: {
+        color: SECUNDARY_COLOR,
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    quantityInput: {
+        width: 60,
+        height: 40,
+        backgroundColor: '#f5f5f5',
+        textAlign: 'center',
+        borderRadius: 5,
+        borderColor: '#ddd',
+        borderWidth: 1,
+    },
     cartContainer: {
         marginTop: 30,
     },
@@ -96,10 +123,19 @@ export const styles = StyleSheet.create({
     cartItemName: {
         fontSize: 18,
         fontWeight: 'bold',
+        flex: 0,
+        alignSelf: 'auto'
     },
     cartItemPrice: {
         fontSize: 16,
         color: '#888',
+        flex: 0,
+        alignSelf: 'auto'
+    },
+    cartItemQuantity: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginVertical: 5,
     },
     removeButton: {
         marginTop: 10,
@@ -117,11 +153,44 @@ export const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
     },
-    iconPassword:{
-        position:'absolute',
-        right:20,
-        zIndex:1,
-        marginTop:20,
+    iconPassword: {
+        position: 'absolute',
+        right: 20,
+        zIndex: 1,
+        marginTop: 20,
         color: 'black'
-    }
+    },
+    container: {
+        flex: 1,
+        padding: 20,
+        backgroundColor: '#f8f8f8',
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+    },
+    productImage: {
+        width: 175,
+        height: 125,
+        marginRight: 2,
+        alignSelf: 'center'
+    },
+    cartItemImage: {
+        width: 60,
+        height: 40,
+        marginRight: 2,
+        alignSelf: 'auto'
+    },
+    purchaseButton: {
+        marginTop: 20,
+        padding: 15,
+        backgroundColor: '#28a745',
+        borderRadius: 5,
+    },
+    purchaseButtonText: {
+        color: '#fff',
+        textAlign: 'center',
+        fontWeight: 'bold',
+    },
 });

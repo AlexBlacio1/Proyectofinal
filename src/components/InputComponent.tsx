@@ -1,28 +1,25 @@
 import React from 'react';
-import { TextInput, View } from 'react-native';
-import { styles } from '../theme/appTheme';
+import { TextInput, View, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import { PRIMARY_COLOR } from '../commons/constants';
-import { SECUNDARY_COLOR } from '../commons/constants';
-
+import { PRIMARY_COLOR, SECUNDARY_COLOR } from '../commons/constants';
 
 interface Props {
     placeholder: string;
     handleSetValues: (name: string, value: string) => void;
     name: string;
     isPassword?: boolean;
-    hasIcon?: boolean;
+    rightIcon?: React.ReactNode;
 }
 
-export const InputComponent = ({ placeholder, handleSetValues, name, isPassword = false }: Props) => {
-
+export const InputComponent: React.FC<Props> = ({
+    placeholder,
+    handleSetValues,
+    name,
+    isPassword = false,
+    rightIcon
+}) => {
     return (
-        <View>
-            <Icon
-                name='visibility'
-                size={23}
-                color={SECUNDARY_COLOR}
-                style={styles.iconPassword} />
+        <View style={styles.container}>
             <TextInput
                 placeholder={placeholder}
                 keyboardType='default'
@@ -30,6 +27,25 @@ export const InputComponent = ({ placeholder, handleSetValues, name, isPassword 
                 secureTextEntry={isPassword}
                 style={styles.inputText}
             />
+            {rightIcon && <View style={styles.iconContainer}>{rightIcon}</View>}
         </View>
-    )
-}
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: '#ccc',
+        marginBottom: 20,
+    },
+    inputText: {
+        flex: 1,
+        fontSize: 16,
+        padding: 10,
+    },
+    iconContainer: {
+        padding: 10,
+    },
+});
